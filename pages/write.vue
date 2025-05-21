@@ -209,51 +209,55 @@ export default {
       });
     },
     async uploadImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+      const file = event.target.files[0]; // 사용자가 선택한 파일 가져오기
+      if (!file) return; // 파일이 없으면 함수 종료
 
-      this.uploading = true;
-      this.message = '이미지 업로드 중...';
-      this.messageType = 'info';
+      this.uploading = true; // 업로드 중 상태로 설정
+      this.message = '이미지 업로드 중...'; // 사용자에게 업로드 중임을 알림
+      this.messageType = 'info'; // 메시지 타입을 정보로 설정
 
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
+        // 파일 이름 생성: 고유한 이름으로 충돌 방지
+        const fileExt = file.name.split('.').pop(); // 파일 확장자 추출
+        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`; // 타임스탬프와 랜덤 문자열 조합
 
-        // 타임아웃 설정 (예: 10초)
+        // 업로드 요청과 타임아웃 설정
         const uploadPromise = this.$supabase.storage
-          .from('apidocsimgs')
-          .upload(fileName, file);
+          .from('apidocsimgs') // Supabase 스토리지 버킷 지정
+          .upload(fileName, file); // 파일 업로드 요청
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('업로드 시간 초과')), 10000)
+          setTimeout(() => reject(new Error('업로드 시간 초과')), 10000) // 10초 후 타임아웃
         );
 
+        // 업로드와 타임아웃 중 먼저 완료되는 것을 처리
         const { error: uploadError } = await Promise.race([uploadPromise, timeoutPromise]);
 
         if (uploadError) {
-          console.error('업로드 오류:', uploadError);
-          throw uploadError;
+          console.error('업로드 오류:', uploadError); // 에러 로그 출력
+          throw uploadError; // 에러 발생 시 예외 처리로 이동
         }
 
+        // 업로드된 파일의 공개 URL 가져오기
         const { data: urlData } = this.$supabase.storage
           .from('apidocsimgs')
           .getPublicUrl(fileName);
 
         if (!urlData.publicUrl) {
-          throw new Error('공개 URL을 가져오지 못했습니다.');
+          throw new Error('공개 URL을 가져오지 못했습니다.'); // URL 획득 실패 시 예외 처리
         }
 
-        this.form.image_url = urlData.publicUrl;
-        this.message = '이미지 업로드 성공!';
-        this.messageType = 'success';
+        this.form.image_url = urlData.publicUrl; // 폼에 이미지 URL 저장
+        this.message = '이미지 업로드 성공!'; // 성공 메시지 표시
+        this.messageType = 'success'; // 메시지 타입을 성공으로 설정
       } catch (error) {
-        console.error('이미지 업로드 오류:', error);
-        this.message = `이미지 업로드 실패: ${error.message}`;
-        this.messageType = 'error';
+        console.error('이미지 업로드 오류:', error); // 에러 로그 출력
+        this.message = `이미지 업로드 실패: ${error.message}`; // 실패 메시지 표시
+        this.messageType = 'error'; // 메시지 타입을 에러로 설정
+        this.form.image_url = ''; // 실패 시 이미지 URL 초기화
       } finally {
-        this.uploading = false;
+        this.uploading = false; // 업로드 상태 해제
         setTimeout(() => {
-          this.message = '';
+          this.message = ''; // 3초 후 메시지 제거
           this.messageType = '';
         }, 3000);
       }
