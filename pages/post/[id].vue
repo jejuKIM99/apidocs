@@ -318,7 +318,7 @@ export default {
 
 /* 스크롤바 설정*/
 pre::-webkit-scrollbar{
-  width: 20px;
+  width: 10px;
 }
 
 /* 스크롤바 막대 설정*/
