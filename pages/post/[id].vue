@@ -6,42 +6,50 @@
     >
       <div class="text-back"></div>
       <h1>{{ post.title }}</h1>
-      <button v-if="isAuthenticated" class="edit-btn" @click="toggleEditMode">수정</button>
+      <button class="request-edit-btn" @click="openRequestModal">수정 요청</button>
     </div>
-    <div class="post-content markdown-body" v-if="!isEditing" v-html="parseMarkdown(post.content)"></div>
-    <div class="edit-form" v-else>
-      <div class="form-group">
-        <label for="edit-title">제목</label>
-        <input
-          id="edit-title"
-          v-model="editForm.title"
-          type="text"
-          placeholder="게시글 제목을 입력하세요"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="edit-content">본문 내용 (Markdown)</label>
-        <textarea
-          id="edit-content"
-          v-model="editForm.content"
-          placeholder="Markdown 형식으로 내용을 입력하세요"
-          rows="10"
-          required
-        ></textarea>
-      </div>
-      <div class="form-actions">
-        <button class="submit-btn" @click="saveChanges" :disabled="saving">저장</button>
-        <button class="cancel-btn" @click="cancelEdit">취소</button>
-      </div>
-      <p v-if="error" class="error-message">{{ error.message }}</p>
-    </div>
+    <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
   </div>
   <div v-else-if="error">
     <p>오류 발생: {{ error.message }}</p>
   </div>
   <div v-else>
     <p>게시글을 불러오는 중...</p>
+  </div>
+
+  <!-- 수정 요청 모달 -->
+  <div v-if="showRequestModal" class="modal-overlay" @click.self="closeRequestModal">
+    <div class="modal-content">
+      <button class="close-btn" @click="closeRequestModal">×</button>
+      <div class="request-form">
+        <h2>수정 요청</h2>
+        <div class="form-group">
+          <label for="request-title">제목</label>
+          <input
+            id="request-title"
+            v-model="requestForm.title"
+            type="text"
+            placeholder="수정 요청 제목을 입력하세요"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="request-content">본문 내용 (Markdown)</label>
+          <textarea
+            id="request-content"
+            v-model="requestForm.content"
+            placeholder="Markdown 형식으로 내용을 입력하세요"
+            rows="10"
+            required
+          ></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="submit-btn" @click="submitRequest" :disabled="saving">요청 제출</button>
+          <button class="cancel-btn" @click="closeRequestModal">취소</button>
+        </div>
+        <p v-if="error" class="error-message">{{ error.message }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -51,9 +59,8 @@ export default {
     return {
       post: null,
       error: null,
-      isEditing: false,
-      isAuthenticated: false, // 로그인 상태를 저장하는 변수
-      editForm: {
+      showRequestModal: false,
+      requestForm: {
         title: '',
         content: '',
       },
@@ -187,31 +194,27 @@ export default {
       if (inChecklist) html += '</ul>';
       if (inQuote) html += '</blockquote>';
 
-      console.log('Parsed Markdown HTML:', html);
       return html;
     },
     applyInlineStyles(text) {
-      // 링크 처리 ([텍스트](URL))
       text = text.replace(/$$ ([^ $$]*)\]$$ ([^)]+) $$/g, '<a href="$2">$1</a>');
-      // 이미지 처리 (![설명](URL))
       text = text.replace(/!$$ ([^ $$]*)\]$$ ([^)]+) $$/g, '<img src="$2" alt="$1">');
-      // 굵은 글씨 (**text**)
       text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      // 기울임 (*text*)
       text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      // 인라인 코드 (`text`)
       text = text.replace(/`(.*?)`/g, '<code>$1</code>');
       return text;
     },
-    toggleEditMode() {
-      this.isEditing = !this.isEditing;
-      if (this.isEditing) {
-        this.editForm.title = this.post.title;
-        this.editForm.content = this.post.content;
-      }
+    openRequestModal() {
+      this.showRequestModal = true;
+      this.requestForm.title = '';
+      this.requestForm.content = '';
     },
-    async saveChanges() {
-      if (!this.editForm.title.trim() || !this.editForm.content.trim()) {
+    closeRequestModal() {
+      this.showRequestModal = false;
+      this.error = null;
+    },
+    async submitRequest() {
+      if (!this.requestForm.title.trim() || !this.requestForm.content.trim()) {
         this.error = { message: '제목과 본문은 필수입니다.' };
         return;
       }
@@ -221,47 +224,28 @@ export default {
 
       try {
         const { error } = await this.$supabase
-          .from('api_posts')
-          .update({
-            title: this.editForm.title,
-            content: this.editForm.content,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', this.post.id);
+          .from('edit_requests')
+          .insert({
+            post_id: this.post.id,
+            title: this.requestForm.title,
+            content: this.requestForm.content,
+            created_at: new Date().toISOString(),
+          });
 
         if (error) {
           throw error;
         }
 
-        this.post.title = this.editForm.title;
-        this.post.content = this.editForm.content;
-        this.isEditing = false;
+        this.closeRequestModal();
       } catch (err) {
-        console.error('Error updating post:', err);
-        this.error = { message: `수정 실패: ${err.message}` };
+        console.error('Error submitting request:', err);
+        this.error = { message: `요청 제출 실패: ${err.message}` };
       } finally {
         this.saving = false;
       }
     },
-    cancelEdit() {
-      this.isEditing = false;
-      this.error = null;
-      this.editForm.title = '';
-      this.editForm.content = '';
-    },
-    async checkAuth() {
-      try {
-        const { data: { user } } = await this.$supabase.auth.getUser();
-        this.isAuthenticated = !!user;
-      } catch (err) {
-        console.error('Error checking auth:', err);
-        this.isAuthenticated = false;
-      }
-    },
   },
   async mounted() {
-    await this.checkAuth(); // 로그인 상태 확인
-
     const id = this.$route.params.id;
     console.log('Fetching post with ID:', id);
     const { data, error } = await this.$supabase.from('api_posts').select('*').eq('id', id).single();
@@ -272,21 +256,6 @@ export default {
       console.log('Fetched post:', data);
       this.post = data;
     }
-
-    this.$nextTick(() => {
-      const markdownBody = document.querySelector('.markdown-body pre');
-      if (markdownBody) {
-        const computedStyles = window.getComputedStyle(markdownBody);
-        console.log('Computed styles for .markdown-body pre:', {
-          backgroundColor: computedStyles.backgroundColor,
-          color: computedStyles.color,
-          padding: computedStyles.padding,
-          fontFamily: computedStyles.fontFamily,
-        });
-      } else {
-        console.log('No .markdown-body pre elements found in DOM');
-      }
-    });
   },
 };
 </script>
@@ -444,7 +413,7 @@ export default {
   color: #2f363d;
 }
 
-.edit-btn {
+.request-edit-btn {
   position: absolute;
   bottom: 20px;
   right: 20px;
@@ -458,17 +427,45 @@ export default {
   z-index: 2;
 }
 
-.edit-btn:hover {
+.request-edit-btn:hover {
   background-color: #218838;
 }
 
-.edit-form {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  background-color: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 6px;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: min(90vw, 600px);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .form-group {
