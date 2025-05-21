@@ -323,10 +323,10 @@ pre::-webkit-scrollbar{
 
 /* 스크롤바 막대 설정*/
 pre::-webkit-scrollbar-thumb{
-  background-color: rgba(255,255,255,1);
+  background-color: #2cdb43;
   /* 스크롤바 둥글게 설정    */
   border-radius: 10px; 
-  border: 7px solid rgba(0,0,0,0.8);
+  border: 7px solid #2cdb43;
 }
 
 /* 스크롤바 뒷 배경 설정*/
