@@ -105,7 +105,10 @@ export default {
   methods: {
     async fetchPosts() {
       try {
-        const { data, error } = await this.$supabase.from('api_posts').select('*');
+        const { data, error } = await this.$supabase
+          .from('api_posts')
+          .select('*')
+          .order('id', { ascending: false });
         if (error) {
           console.error('게시글 가져오기 오류:', error);
           return;
