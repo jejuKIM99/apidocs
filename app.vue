@@ -29,6 +29,7 @@
 
     <!-- 페이지 콘텐츠 렌더링 -->
     <NuxtPage />
+    <SpeedInsights />
   </div>
 </template>
 
