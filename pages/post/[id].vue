@@ -316,6 +316,24 @@ export default {
   color: inherit !important;
 }
 
+/* 스크롤바 설정*/
+pre::-webkit-scrollbar{
+  width: 20px;
+}
+
+/* 스크롤바 막대 설정*/
+pre::-webkit-scrollbar-thumb{
+  background-color: rgba(255,255,255,1);
+  /* 스크롤바 둥글게 설정    */
+  border-radius: 10px; 
+  border: 7px solid rgba(0,0,0,0.8);
+}
+
+/* 스크롤바 뒷 배경 설정*/
+pre::-webkit-scrollbar-track{
+  background-color: rgba(0,0,0,0);
+}
+
 .markdown-body ul {
   list-style: disc;
   margin: 1em 0;
@@ -381,7 +399,7 @@ export default {
   width: 100%;
   height: 100%;
   position: absolute;
-  background: #0000006b;
+  background: #000000bd;
   z-index: 0;
   border-bottom: solid 2px #fff;
 }
