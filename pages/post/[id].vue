@@ -389,7 +389,7 @@ export default {
 .post-header {
   position: relative;
   height: 300px;
-  background-size: cover;
+  background-size: auto;
   background-position: center;
   display: flex;
   justify-content: center;

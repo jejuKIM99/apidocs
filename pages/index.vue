@@ -12,7 +12,7 @@
 
     <!-- Fonts 게시판 텍스트 입력 폼 및 설정 -->
     <div v-if="currentMenu === 'Fonts'" class="font-preview-input">
-      <input v-model="previewText" placeholder="미리보기 텍스트를 입력하세요" style="width: 400px; height: 30px; border-radius: 6px; border: solid 1px #40ed21; background-color: #000;" />
+      <input v-model="previewText" placeholder="미리보기 텍스트를 입력하세요" style="width: 400px; height: 30px; border-radius: 6px; border: solid 1px #40ed21; background-color: #000; color: #fff;" />
       <div class="font-controls">
         <label for="font-size">Font-size: {{ fontSize }}px</label>
         <input
