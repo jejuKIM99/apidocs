@@ -408,8 +408,8 @@ export default {
   max-width: 800px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background-color: #f6f8fa;
-  border: 1px solid #e1e4e8;
+  background-color: #141414;
+  border: 2px solid #2cdb43;
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   color: #2f363d;
@@ -426,7 +426,7 @@ export default {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.4rem;
   z-index: 2;
 }
 
