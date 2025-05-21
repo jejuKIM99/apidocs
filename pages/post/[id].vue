@@ -412,7 +412,7 @@ export default {
   border: 2px solid #2cdb43;
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  color: #2f363d;
+  color: #fff;
 }
 
 .request-edit-btn {
