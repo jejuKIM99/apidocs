@@ -72,12 +72,9 @@ export default {
               console.error('로그아웃 오류:', error.message);
               alert('로그아웃 실패: ' + error.message);
             } else {
-              user.value = null;
+              user.value = null; // 사용자 상태 즉시 초기화
               closeAuthModal();
-              await supabase.auth.refreshSession();
-              await initializeSession();
-              // 로컬 스토리지 정리 (선택 사항)
-              localStorage.removeItem('supabase.auth.token');
+              await initializeSession(); // 세션 갱신
               console.log('로그아웃 성공');
             }
           } catch (err) {
@@ -88,7 +85,6 @@ export default {
           showAuthModal.value = true;
         }
       };
-
     const closeAuthModal = () => {
       showAuthModal.value = false;
     };
