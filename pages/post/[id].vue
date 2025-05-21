@@ -9,6 +9,7 @@
       <button class="request-edit-btn" @click="openRequestModal">수정 요청</button>
     </div>
     <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
+    <div class="bottom-margin"></div>
   </div>
   <div v-else-if="error">
     <p>오류 발생: {{ error.message }}</p>
@@ -382,6 +383,7 @@ export default {
   position: absolute;
   background: #0000006b;
   z-index: 0;
+  border-bottom: solid 2px #fff;
 }
 
 .post-header {
@@ -536,5 +538,10 @@ export default {
   padding: 0.75rem;
   border-radius: 4px;
   margin-top: 1rem;
+}
+
+.bottom-margin{
+  width: 100vw;
+  height: 30px;
 }
 </style>
