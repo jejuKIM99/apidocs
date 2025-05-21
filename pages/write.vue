@@ -219,9 +219,16 @@ export default {
       try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
-        const { error: uploadError } = await this.$supabase.storage
+
+        // 타임아웃 설정 (예: 10초)
+        const uploadPromise = this.$supabase.storage
           .from('apidocsimgs')
           .upload(fileName, file);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('업로드 시간 초과')), 10000)
+        );
+
+        const { error: uploadError } = await Promise.race([uploadPromise, timeoutPromise]);
 
         if (uploadError) {
           console.error('업로드 오류:', uploadError);
