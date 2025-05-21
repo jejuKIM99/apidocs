@@ -224,6 +224,7 @@ export default {
           .upload(fileName, file);
 
         if (uploadError) {
+          console.error('업로드 오류:', uploadError);
           throw uploadError;
         }
 
@@ -277,7 +278,6 @@ export default {
         this.message = '게시글이 성공적으로 저장되었습니다!';
         this.messageType = 'success';
 
-        // 폼 초기화
         this.form = {
           type: 'API',
           title: '',
@@ -287,7 +287,6 @@ export default {
           is_free_font: false,
         };
 
-        // 3초 후 메시지 제거 및 페이지 이동
         setTimeout(() => {
           this.message = '';
           this.messageType = '';

@@ -107,10 +107,11 @@ export default {
       try {
         const { data, error } = await this.$supabase.from('api_posts').select('*');
         if (error) {
-          console.error('Error fetching posts:', error);
+          console.error('게시글 가져오기 오류:', error);
           return;
         }
         if (!data || data.length === 0) {
+          console.log('데이터가 없습니다.');
           this.posts = [];
         } else {
           this.posts = data.map(post => ({
@@ -127,7 +128,7 @@ export default {
           this.loadFonts();
         }
       } catch (err) {
-        console.error('Unexpected error fetching posts:', err);
+        console.error('게시글 가져오기 중 예기치 않은 오류:', err);
       }
     },
     extractFontName(fontCdn, title) {
