@@ -65,7 +65,7 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  background-color: #1d1d1d;
+  background-color: #000;
 }
 .nav-menu {
   list-style: none;
