@@ -294,7 +294,7 @@ export default {
 }
 
 .markdown-body code {
-  background-color: #f6f8fa !important;
+  background-color: #027a00 !important;
   padding: 0.2em 0.4em !important;
   border-radius: 3px !important;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace !important;
