@@ -6,7 +6,7 @@
     >
       <div class="text-back"></div>
       <h1>{{ post.title }}</h1>
-      <button class="request-edit-btn" @click="openRequestModal">수정 요청</button>
+      <button class="request-edit-btn" @click="openRequestModal">Modification request</button>
     </div>
     <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
     <div class="bottom-margin"></div>
@@ -23,7 +23,7 @@
     <div class="modal-content">
       <button class="close-btn" @click="closeRequestModal">×</button>
       <div class="request-form">
-        <h2>수정 요청</h2>
+        <h2>Modification request</h2>
         <div class="form-group">
           <label for="request-title">제목</label>
           <input
@@ -35,7 +35,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="request-content">본문 내용 (Markdown)</label>
+          <label for="request-content">본문 내용 (Markdown형태 가능)</label>
           <textarea
             id="request-content"
             v-model="requestForm.content"
@@ -416,11 +416,12 @@ export default {
 }
 
 .request-edit-btn {
+  font-family: 'Super Guardian', sans-serif;
   position: absolute;
   bottom: 20px;
   right: 20px;
   padding: 0.5rem 1rem;
-  background-color: #28a745;
+  background-color: transparent;
   color: white;
   border: none;
   border-radius: 4px;
@@ -430,7 +431,7 @@ export default {
 }
 
 .request-edit-btn:hover {
-  background-color: #218838;
+  color: #2dc14d;
 }
 
 .modal-overlay {
