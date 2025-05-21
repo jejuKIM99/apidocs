@@ -205,6 +205,7 @@ export default {
   overflow: hidden;
   text-decoration: none;
   color: inherit;
+  background-color: #40ed21;
 }
 
 .card img {
