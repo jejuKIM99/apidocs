@@ -110,6 +110,17 @@ export default {
         this.$refs.fontSizeSlider.style.setProperty('--value', newValue);
       }
     },
+    currentMenu(newMenu) {
+      // Fonts 메뉴로 전환 시 슬라이더 초기화
+      if (newMenu === 'Fonts') {
+        this.$nextTick(() => {
+          if (this.$refs.fontSizeSlider) {
+            this.$refs.fontSizeSlider.value = this.fontSize; // 슬라이더의 DOM value 동기화
+            this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize); // CSS 변수 동기화
+          }
+        });
+      }
+    },
   },
   methods: {
     async fetchPosts() {
@@ -198,6 +209,7 @@ export default {
     // 초기 fontSize 값으로 --value 설정
     this.$nextTick(() => {
       if (this.$refs.fontSizeSlider) {
+        this.$refs.fontSizeSlider.value = this.fontSize; // 초기 슬라이더 DOM value 설정
         this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize);
       }
     });
@@ -245,13 +257,13 @@ export default {
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  background-color: #40ed21;
+  background-color: #000;
 }
 
 .card img {
   width: 100%;
   height: 200px;
-  object-fit: fill;
+  object-fit: contain;
 }
 
 .no-image {
@@ -274,6 +286,7 @@ export default {
 }
 
 .card .content {
+  border-top: solid 2px;
   padding: 1rem;
   background-color: #000;
 }
@@ -304,11 +317,12 @@ export default {
 }
 
 .font-controls input[type="range"] {
+  width: 150px;
   height: 8px;
   -webkit-appearance: none;
   background: #000; /* 트랙 배경색 */
   border-radius: 5px;
-  outline: auto;
+  outline: none;
 }
 
 /* Webkit 브라우저(Chrome, Safari)용 슬라이더 트랙 스타일 */
@@ -324,7 +338,7 @@ export default {
   width: 8px;
   height: 8px;
   background: #40ed21; /* thumb 색상 */
-  border-radius: 0 50% 50% 0;
+  border-radius: 50%;
   cursor: pointer;
   margin-top: 0; /* thumb과 트랙의 수직 정렬 */
 }
@@ -333,7 +347,7 @@ export default {
 .font-controls input[type="range"]::-moz-range-track {
   height: 8px;
   background: #000;
-  border-radius: 50%;
+  border-radius: 5px;
 }
 
 /* Firefox용 슬라이더 thumb 스타일 */
@@ -342,7 +356,7 @@ export default {
   height: 8px;
   background: #40ed21;
   border: none;
-  border-radius: 0 50% 50% 0;
+  border-radius: 50%;
   cursor: pointer;
 }
 
@@ -350,7 +364,7 @@ export default {
 .font-controls input[type="range"]::-moz-range-progress {
   background: #40ed21;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 5px;
 }
 
 /* 슬라이더 값에 따라 동적으로 채워지는 부분을 처리하기 위한 변수 설정 */
