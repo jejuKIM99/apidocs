@@ -201,7 +201,6 @@ export default {
 
 .card {
   font-family: "Signika Negative", sans-serif;
-  
   border: 2px solid #40ed21;
   border-radius: 5px;
   width: min(80vw, 300px);

@@ -31,6 +31,12 @@
     <NuxtPage />
     <SpeedInsights />
   </div>
+
+  <!-- 푸터 -->
+  <footer class="footer">
+    <p>&copy; 2025 Code-Jesus Project. All rights reserved.</p>
+    <p>GitHub: <a href="https://github.com/jejuKIM99" target="_blank">jejuKIM99 GitHub</a></p>
+  </footer>
 </template>
 
 <script>
@@ -80,5 +86,27 @@ export default {
 }
 .nav-menu li a.active {
   color: #40ed21; /* 선택된 메뉴 색상: 초록색 */
+}
+
+.footer {
+  /* background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(/_nuxt/assets/css/cj.png); */
+  text-align: center;
+  padding: 1rem;
+  background-color: #000;
+  color: #40ed21;
+  border-top: 1px solid #40ed21;
+  margin-top: 2rem;
+}
+
+.footer a {
+  color: #40ed21;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
 }
 </style>
