@@ -6,7 +6,7 @@
     >
       <div class="text-back"></div>
       <h1>{{ post.title }}</h1>
-      <button class="request-edit-btn" @click="openRequestModal">Modification request</button>
+      <button class="request-edit-btn" @click="openRequestModal">Request</button>
     </div>
     <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
     <div class="bottom-margin"></div>
@@ -23,7 +23,7 @@
     <div class="modal-content">
       <button class="close-btn" @click="closeRequestModal">×</button>
       <div class="request-form">
-        <h2>Modification request</h2>
+        <h2>Request</h2>
         <div class="form-group">
           <label for="request-title">제목</label>
           <input
@@ -39,7 +39,11 @@
           <textarea
             id="request-content"
             v-model="requestForm.content"
-            placeholder="Markdown 형식으로 내용을 입력하세요"
+            placeholder=
+            "요청사항을 입력하세요.
+수정 요청의 경우, 해당 게시글 제목을 알려주세요.
+자료 추가 요청의 경우, 공식 문서의 URL을 Markdown URL 형태로 입력해 주세요.
+"
             rows="10"
             required
           ></textarea>
