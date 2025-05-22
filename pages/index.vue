@@ -128,7 +128,7 @@ export default {
             content: post.content,
             is_free_font: post.is_free_font,
           }));
-          this.loadFonts();
+          await this.loadFonts();
         }
       } catch (err) {
         console.error('게시글 가져오기 중 예기치 않은 오류:', err);
@@ -139,8 +139,14 @@ export default {
         return 'sans-serif';
       }
       if (fontCdn.includes('fonts.googleapis.com')) {
-        const match = fontCdn.match(/family=([^&]+)/);
-        return match ? match[1].replace('+', ' ') : 'sans-serif';
+        // Google Fonts CDN에서 family 파라미터 추출
+        const match = fontCdn.match(/family=([^&:]+)/);
+        if (match) {
+          // 가변 폰트 처리 (예: Signika+Negative:wght@300..700)
+          const fontFamily = match[1].split(':')[0].replace(/\+/g, ' ');
+          return fontFamily;
+        }
+        return 'sans-serif';
       }
       if (fontCdn.includes('fonts.cdnfonts.com')) {
         const match = fontCdn.match(/css\/(.+)/);
@@ -148,17 +154,34 @@ export default {
       }
       return 'sans-serif';
     },
-    loadFonts() {
+    async loadFonts() {
       const loadedFonts = new Set();
-      this.posts.forEach(post => {
+      for (const post of this.posts) {
         if (post.type === 'Fonts' && post.font_cdn && !loadedFonts.has(post.font_cdn)) {
           loadedFonts.add(post.font_cdn);
-          const link = document.createElement('link');
-          link.href = post.font_cdn;
-          link.rel = 'stylesheet';
-          document.head.appendChild(link);
+          try {
+            // Google Fonts의 경우, 가변 폰트를 명시적으로 로드
+            let href = post.font_cdn;
+            if (href.includes('fonts.googleapis.com') && !href.includes('display=')) {
+              href += '&display=swap'; // 폰트 로드 최적화
+            }
+            const link = document.createElement('link');
+            link.href = href;
+            link.rel = 'stylesheet';
+            document.head.appendChild(link);
+            // 폰트 로드 완료 대기
+            await new Promise(resolve => {
+              link.onload = resolve;
+              link.onerror = () => {
+                console.warn(`폰트 로드 실패: ${href}`);
+                resolve();
+              };
+            });
+          } catch (err) {
+            console.warn(`폰트 로드 중 오류: ${post.font_cdn}`, err);
+          }
         }
-      });
+      }
     },
   },
   mounted() {
