@@ -317,12 +317,11 @@ export default {
 }
 
 .font-controls input[type="range"] {
-  width: 150px;
   height: 8px;
   -webkit-appearance: none;
   background: #000; /* 트랙 배경색 */
   border-radius: 5px;
-  outline: none;
+  outline: auto;
 }
 
 /* Webkit 브라우저(Chrome, Safari)용 슬라이더 트랙 스타일 */
@@ -338,7 +337,7 @@ export default {
   width: 8px;
   height: 8px;
   background: #40ed21; /* thumb 색상 */
-  border-radius: 50%;
+  border-radius: 0 50% 50% 0;
   cursor: pointer;
   margin-top: 0; /* thumb과 트랙의 수직 정렬 */
 }
@@ -356,7 +355,7 @@ export default {
   height: 8px;
   background: #40ed21;
   border: none;
-  border-radius: 50%;
+  border-radius: 0 50% 50% 0;
   cursor: pointer;
 }
 
