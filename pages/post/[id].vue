@@ -55,6 +55,9 @@
 </template>
 
 <script>
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css'; // 깃허브 다크 스타일 적용 (원하는 스타일로 변경 가능)
+
 export default {
   data() {
     return {
@@ -79,6 +82,8 @@ export default {
       let inList = false;
       let inChecklist = false;
       let inQuote = false;
+      let codeBlockLines = [];
+      let codeLanguage = '';
 
       lines.forEach((line) => {
         if (!line.trim() && !inCodeBlock) {
@@ -93,16 +98,23 @@ export default {
 
         if (line.trim().startsWith('```')) {
           if (inCodeBlock) {
-            html += '</code></pre>';
+            const code = codeBlockLines.join('\n');
+            const highlightedCode = codeLanguage
+              ? hljs.highlight(code, { language: codeLanguage }).value
+              : hljs.highlightAuto(code).value;
+            html += `<pre><code class="hljs">${highlightedCode}</code></pre>`;
             inCodeBlock = false;
+            codeBlockLines = [];
+            codeLanguage = '';
           } else {
-            html += '<pre><code class="code-block">';
+            const language = line.trim().slice(3).trim();
+            codeLanguage = language || '';
             inCodeBlock = true;
           }
           return;
         }
         if (inCodeBlock) {
-          html += `${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}\n`;
+          codeBlockLines.push(line);
           return;
         }
 
@@ -128,7 +140,7 @@ export default {
           return;
         } else if (inTable) {
           html += '</tbody></table>';
-          inTable = false;
+           inTable = false;
         }
 
         if (line.trim() === '---') {
@@ -189,7 +201,13 @@ export default {
         }
       });
 
-      if (inCodeBlock) html += '</code></pre>';
+      if (inCodeBlock) {
+        const code = codeBlockLines.join('\n');
+        const highlightedCode = codeLanguage
+          ? hljs.highlight(code, { language: codeLanguage }).value
+          : hljs.highlightAuto(code).value;
+        html += `<pre><code class="hljs">${highlightedCode}</code></pre>`;
+      }
       if (inTable) html += '</tbody></table>';
       if (inList) html += '</ul>';
       if (inChecklist) html += '</ul>';
@@ -310,24 +328,24 @@ export default {
   margin: 1em 0 !important;
 }
 
-.markdown-body pre code.code-block {
+.markdown-body pre code.hljs {
   background: none !important;
-  padding: 0 !important;
+  padding: 20px 0px !important;
   color: inherit !important;
 }
 
-pre::-webkit-scrollbar{
-  width: 10px;
+pre code.hljs::-webkit-scrollbar {
+  height: 10px;
 }
 
-pre::-webkit-scrollbar-thumb{
+pre code.hljs::-webkit-scrollbar-thumb {
   background-color: #2cdb43;
-  border-radius: 10px; 
+  border-radius: 10px;
   border: 4px solid #2cdb43;
 }
 
-pre::-webkit-scrollbar-track{
-  background-color: rgba(0,0,0,0);
+pre code.hljs::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .markdown-body ul {
@@ -555,7 +573,7 @@ pre::-webkit-scrollbar-track{
   margin-top: 1rem;
 }
 
-.bottom-margin{
+.bottom-margin {
   width: 100vw;
   height: 30px;
 }
