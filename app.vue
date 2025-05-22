@@ -60,6 +60,7 @@ export default {
 
 <style scoped>
 .navbar {
+  width: 100vw;
   font-family: 'Super Guardian', sans-serif;
   display: flex;
   justify-content: center;
