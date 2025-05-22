@@ -13,4 +13,9 @@ export default defineNuxtConfig({
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
     },
   },
+  app: {
+        head: {
+          title: "Holy Code!!!"
+        }
+      }
 })
