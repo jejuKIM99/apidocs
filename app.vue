@@ -89,10 +89,9 @@ export default {
 }
 
 .footer {
-  /* background-size: contain;
+  background-size: contain;
   background-position: center;
-  background-repeat: no-repeat;
-  background-image: url(/_nuxt/assets/css/cj.png); */
+  background-image: url(/_nuxt/assets/css/cj2.png);
   text-align: center;
   padding: 1rem;
   background-color: #000;
