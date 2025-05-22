@@ -441,6 +441,7 @@ pre code.hljs::-webkit-scrollbar-track {
 }
 
 .post-content {
+  width: 80vw;
   max-width: 800px;
   margin: 2rem auto;
   padding: 1.5rem;
