@@ -18,6 +18,7 @@
         <input
           type="range"
           id="font-size"
+          ref="fontSizeSlider"
           v-model.number="fontSize"
           min="12"
           max="48"
@@ -102,6 +103,14 @@ export default {
     },
   },
   inject: ['currentMenu', 'setCurrentMenu'],
+  watch: {
+    fontSize(newValue) {
+      // fontSize 값이 변경될 때 CSS 변수 --value 업데이트
+      if (this.$refs.fontSizeSlider) {
+        this.$refs.fontSizeSlider.style.setProperty('--value', newValue);
+      }
+    },
+  },
   methods: {
     async fetchPosts() {
       try {
@@ -186,6 +195,12 @@ export default {
   },
   mounted() {
     this.fetchPosts();
+    // 초기 fontSize 값으로 --value 설정
+    this.$nextTick(() => {
+      if (this.$refs.fontSizeSlider) {
+        this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize);
+      }
+    });
   },
 };
 </script>
@@ -289,13 +304,73 @@ export default {
 }
 
 .font-controls input[type="range"] {
-  width: 150px;
+  height: 8px;
+  -webkit-appearance: none;
+  background: #000; /* 트랙 배경색 */
+  border-radius: 5px;
+  outline: auto;
+}
+
+/* Webkit 브라우저(Chrome, Safari)용 슬라이더 트랙 스타일 */
+.font-controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #40ed21 calc((var(--value) - 12) / (48 - 12) * 100%), #000 calc((var(--value) - 12) / (48 - 12) * 100%));
+}
+
+/* Webkit 브라우저용 슬라이더 thumb 스타일 */
+.font-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  background: #40ed21; /* thumb 색상 */
+  border-radius: 0 50% 50% 0;
+  cursor: pointer;
+  margin-top: 0; /* thumb과 트랙의 수직 정렬 */
+}
+
+/* Firefox용 슬라이더 트랙 스타일 */
+.font-controls input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+}
+
+/* Firefox용 슬라이더 thumb 스타일 */
+.font-controls input[type="range"]::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  background: #40ed21;
+  border: none;
+  border-radius: 0 50% 50% 0;
+  cursor: pointer;
+}
+
+/* Firefox에서 thumb 이동 시 채워지는 트랙 부분 */
+.font-controls input[type="range"]::-moz-range-progress {
+  background: #40ed21;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* 슬라이더 값에 따라 동적으로 채워지는 부분을 처리하기 위한 변수 설정 */
+.font-controls input[type="range"] {
+  --value: 24; /* 초기 값 */
 }
 
 .font-controls select,
 .font-controls input[type="checkbox"] {
+  font-weight: bold;
+  color: #000;
+  background-color: #40ed21;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 5px;
+}
+
+[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #40ed21;
 }
 </style>
