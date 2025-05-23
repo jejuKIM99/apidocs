@@ -7,6 +7,7 @@
       <div class="text-back"></div>
       <h1>{{ post.title }}</h1>
       <button class="request-edit-btn" @click="openRequestModal">Request</button>
+      <button v-if="post.npm_command" class="add-npm-btn" @click="addToCart()"> Add Npm </button>
     </div>
     <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
     <div class="bottom-margin"></div>
@@ -63,6 +64,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css'; // 깃허브 다크 스타일 적용 (원하는 스타일로 변경 가능)
 
 export default {
+  inject: ['addLibrary'],
   data() {
     return {
       post: null,
@@ -266,6 +268,15 @@ export default {
       } finally {
         this.saving = false;
       }
+    },
+    addToCart() {
+      if (!this.post || !this.post.npm_command) return;
+
+      // 제공된(inject된) addLibrary 함수를 직접 호출
+      this.addLibrary({
+        title: this.post.title,
+        npm_command: this.post.npm_command
+      });
     },
   },
   async mounted() {
@@ -581,5 +592,23 @@ pre code.hljs::-webkit-scrollbar-track {
 .bottom-margin {
   width: 100vw;
   height: 30px;
+}
+
+.add-npm-btn {
+  font-family: 'Super Guardian', sans-serif;
+  position: absolute;
+  bottom: 20px;
+  right: 110px;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  z-index: 2;
+}
+.add-npm-btn:hover {
+  color: #32c91e;
 }
 </style>
