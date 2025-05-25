@@ -6,9 +6,9 @@
         <li>
           <NuxtLink
             to="/"
-            @click="selectMenu('API')"
-            :class="{ 'active': currentMenu === 'API' }"
-          >API</NuxtLink>
+            @click="selectMenu('Library')"
+            :class="{ 'active': currentMenu === 'Library' }"
+          >Library</NuxtLink>
         </li>
         <li>
           <NuxtLink
@@ -99,7 +99,7 @@ import { ref, computed } from 'vue';
 export default {
   // 기존 setup() 그대로 유지
   setup() {
-    const currentMenu = ref('API');
+    const currentMenu = ref('Library');
 
     const selectMenu = (menu) => {
       currentMenu.value = menu;
