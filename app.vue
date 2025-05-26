@@ -296,17 +296,20 @@ export default {
   padding: 1rem;
 }
 
-.cart-panel::-webkit-scrollbar {
+.cart-panel::-webkit-scrollbar,
+.help-panel::-webkit-scrollbar {
   width: 6px;
 }
 
-.cart-panel::-webkit-scrollbar-thumb {
+.cart-panel::-webkit-scrollbar-thumb,
+.help-panel::-webkit-scrollbar-thumb {
   background-color: #2cdb43;
   border-radius: 8px;
   border: 4px solid #2cdb43;
 }
 
-.cart-panel::-webkit-scrollbar-track {
+.cart-panel::-webkit-scrollbar-track,
+.help-panel::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);
 }
 
@@ -330,7 +333,7 @@ export default {
   width: 70vw;
   max-width: 300px;
   height: 70vw;
-  max-height: 400px;
+  max-height: 310px;
   background-color: #141414;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
   border-top-left-radius: 8px;
