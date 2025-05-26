@@ -19,7 +19,7 @@
     <p>게시글을 불러오는 중...</p>
   </div>
 
-  <!-- 수정 요청 모달 -->
+  
   <div v-if="showRequestModal" class="modal-overlay" @click.self="closeRequestModal">
     <div class="modal-content">
       <button class="close-btn" @click="closeRequestModal">×</button>
@@ -61,7 +61,7 @@
 
 <script>
 import hljs from 'highlight.js';
-import 'highlight.js/styles/github-dark.css'; // 깃허브 다크 스타일 적용 (원하는 스타일로 변경 가능)
+import 'highlight.js/styles/github-dark.css'; 
 
 export default {
   inject: ['addLibrary'],
@@ -272,10 +272,11 @@ export default {
     addToCart() {
       if (!this.post || !this.post.npm_command) return;
 
-      // 제공된(inject된) addLibrary 함수를 직접 호출
+      
       this.addLibrary({
         title: this.post.title,
-        npm_command: this.post.npm_command
+        npm_command: this.post.npm_command,
+        docId: this.$route.params.id, 
       });
     },
   },

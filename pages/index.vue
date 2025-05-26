@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 검색창 -->
+    
     <div class="search-container">
       <input
         v-model="searchQuery"
@@ -10,7 +10,16 @@
       />
     </div>
 
-    <!-- Fonts 게시판 텍스트 입력 폼 및 설정 -->
+    <div v-if="currentMenu === 'Library'" class="cli-filter">
+      <label for="cli-filter">Is CLI</label>
+      <input
+        type="checkbox"
+        id="cli-filter"
+        v-model="isCliFilter"
+      />
+    </div>
+
+    
     <div v-if="currentMenu === 'Fonts'" class="font-preview-input">
       <input v-model="previewText" placeholder="Preview Text" style="width: 400px; height: 30px; border-radius: 6px; border: solid 1px #40ed21; background-color: #000; color: #fff;" />
       <div class="font-controls">
@@ -47,10 +56,14 @@
       </div>
     </div>
 
-    <!-- 게시글 카드 컨테이너 -->
+    
     <div class="card-wrapper">
       <div class="card-container">
         <NuxtLink v-for="(post, index) in currentPosts" :key="index" :to="`/post/${post.id}`" class="card">
+          <div class="card-header">
+            <div class="card-id">{{ post.id }}</div>
+            <div v-if="post.npm_command" class="cli-badge">Is CLI</div>
+          </div>
           <div v-if="post.type !== 'Fonts'">
             <img v-if="post.image_url" :src="post.image_url" alt="게시글 이미지" />
             <div v-else class="no-image">이미지 없음</div>
@@ -78,13 +91,28 @@ export default {
       fontWeight: 'normal',
       searchQuery: '',
       isFreeFontFilter: false,
+      isCliFilter: false,
     };
   },
   computed: {
     currentPosts() {
-      let filteredPosts = this.posts.filter(post => post.type === this.currentMenu);
+      console.log('현재 메뉴:', this.currentMenu); 
+      let filteredPosts = this.posts.filter(post => {
+        console.log('게시글 데이터:', post); 
+        if (this.currentMenu === 'Library') {
+          return post.type === 'API' && post.is_framework === false; 
+        } else if (this.currentMenu === 'Framework') {
+          return post.type === 'API' && post.is_framework === true; 
+        } else {
+          return post.type === this.currentMenu;
+        }
+      });
+      console.log('필터링된 게시글:', filteredPosts);
 
-      // 검색어 필터링
+      if (this.currentMenu === 'Library' && this.isCliFilter) {
+        filteredPosts = filteredPosts.filter(post => post.npm_command != null);
+      }
+
       if (this.searchQuery.trim()) {
         const query = this.searchQuery.toLowerCase().trim();
         filteredPosts = filteredPosts.filter(post => {
@@ -94,7 +122,6 @@ export default {
         });
       }
 
-      // 완전 무료 폰트 필터링
       if (this.currentMenu === 'Fonts' && this.isFreeFontFilter) {
         filteredPosts = filteredPosts.filter(post => post.is_free_font === true);
       }
@@ -105,18 +132,16 @@ export default {
   inject: ['currentMenu', 'setCurrentMenu'],
   watch: {
     fontSize(newValue) {
-      // fontSize 값이 변경될 때 CSS 변수 --value 업데이트
       if (this.$refs.fontSizeSlider) {
         this.$refs.fontSizeSlider.style.setProperty('--value', newValue);
       }
     },
     currentMenu(newMenu) {
-      // Fonts 메뉴로 전환 시 슬라이더 초기화
       if (newMenu === 'Fonts') {
         this.$nextTick(() => {
           if (this.$refs.fontSizeSlider) {
-            this.$refs.fontSizeSlider.value = this.fontSize; // 슬라이더의 DOM value 동기화
-            this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize); // CSS 변수 동기화
+            this.$refs.fontSizeSlider.value = this.fontSize;
+            this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize);
           }
         });
       }
@@ -127,7 +152,7 @@ export default {
       try {
         const { data, error } = await this.$supabase
           .from('api_posts')
-          .select('*')
+          .select('*, npm_command, is_framework')
           .order('id', { ascending: false });
         if (error) {
           console.error('게시글 가져오기 오류:', error);
@@ -147,7 +172,10 @@ export default {
             type: post.type,
             content: post.content,
             is_free_font: post.is_free_font,
+            npm_command: post.npm_command,
+            is_framework: post.is_framework,
           }));
+          console.log('가져온 게시글:', this.posts); 
           await this.loadFonts();
         }
       } catch (err) {
@@ -159,10 +187,8 @@ export default {
         return 'sans-serif';
       }
       if (fontCdn.includes('fonts.googleapis.com')) {
-        // Google Fonts CDN에서 family 파라미터 추출
         const match = fontCdn.match(/family=([^&:]+)/);
         if (match) {
-          // 가변 폰트 처리 (예: Signika+Negative:wght@300..700)
           const fontFamily = match[1].split(':')[0].replace(/\+/g, ' ');
           return fontFamily;
         }
@@ -180,16 +206,14 @@ export default {
         if (post.type === 'Fonts' && post.font_cdn && !loadedFonts.has(post.font_cdn)) {
           loadedFonts.add(post.font_cdn);
           try {
-            // Google Fonts의 경우, 가변 폰트를 명시적으로 로드
             let href = post.font_cdn;
             if (href.includes('fonts.googleapis.com') && !href.includes('display=')) {
-              href += '&display=swap'; // 폰트 로드 최적화
+              href += '&display=swap';
             }
             const link = document.createElement('link');
             link.href = href;
             link.rel = 'stylesheet';
             document.head.appendChild(link);
-            // 폰트 로드 완료 대기
             await new Promise(resolve => {
               link.onload = resolve;
               link.onerror = () => {
@@ -206,10 +230,9 @@ export default {
   },
   mounted() {
     this.fetchPosts();
-    // 초기 fontSize 값으로 --value 설정
     this.$nextTick(() => {
       if (this.$refs.fontSizeSlider) {
-        this.$refs.fontSizeSlider.value = this.fontSize; // 초기 슬라이더 DOM value 설정
+        this.$refs.fontSizeSlider.value = this.fontSize;
         this.$refs.fontSizeSlider.style.setProperty('--value', this.fontSize);
       }
     });
@@ -258,6 +281,32 @@ export default {
   text-decoration: none;
   color: inherit;
   background-color: #000;
+}
+
+.card-header {
+  position: relative;
+  background-color: #40ed21;
+  color: #000;
+  text-align: center;
+  padding: 2px;
+  font-weight: bold;
+}
+
+.card-id {
+  font-size: 1.2rem;
+}
+
+.cli-badge {
+  position: absolute;
+  width: 100px;
+  top: 50px;
+  left: -34px;
+  background-color: #ff0000;
+  color: #fff;
+  padding: 0.5rem;
+  transform: rotate(-45deg);
+  transform-origin: 0 0;
+  z-index: 1;
 }
 
 .card img {
@@ -319,37 +368,33 @@ export default {
 .font-controls input[type="range"] {
   height: 8px;
   -webkit-appearance: none;
-  background: #000; /* 트랙 배경색 */
+  background: #000;
   border-radius: 5px;
   outline: auto;
 }
 
-/* Webkit 브라우저(Chrome, Safari)용 슬라이더 트랙 스타일 */
 .font-controls input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
   border-radius: 5px;
   background: linear-gradient(to right, #40ed21 calc((var(--value) - 12) / (48 - 12) * 100%), #000 calc((var(--value) - 12) / (48 - 12) * 100%));
 }
 
-/* Webkit 브라우저용 슬라이더 thumb 스타일 */
 .font-controls input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 8px;
   height: 8px;
-  background: #40ed21; /* thumb 색상 */
+  background: #40ed21;
   border-radius: 0 50% 50% 0;
   cursor: pointer;
-  margin-top: 0; /* thumb과 트랙의 수직 정렬 */
+  margin-top: 0;
 }
 
-/* Firefox용 슬라이더 트랙 스타일 */
 .font-controls input[type="range"]::-moz-range-track {
   height: 8px;
   background: #000;
   border-radius: 5px;
 }
 
-/* Firefox용 슬라이더 thumb 스타일 */
 .font-controls input[type="range"]::-moz-range-thumb {
   width: 8px;
   height: 8px;
@@ -359,16 +404,14 @@ export default {
   cursor: pointer;
 }
 
-/* Firefox에서 thumb 이동 시 채워지는 트랙 부분 */
 .font-controls input[type="range"]::-moz-range-progress {
   background: #40ed21;
   height: 8px;
   border-radius: 5px;
 }
 
-/* 슬라이더 값에 따라 동적으로 채워지는 부분을 처리하기 위한 변수 설정 */
 .font-controls input[type="range"] {
-  --value: 24; /* 초기 값 */
+  --value: 24;
 }
 
 .font-controls select,
@@ -382,6 +425,22 @@ export default {
 }
 
 [type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #40ed21;
+}
+
+.cli-filter {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.cli-filter label {
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.cli-filter input[type="checkbox"] {
   width: 20px;
   height: 20px;
   accent-color: #40ed21;
