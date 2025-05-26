@@ -325,19 +325,24 @@ export default {
 
 .help-panel {
   position: fixed;
-  bottom: 426px;
-  right: 0;
+  bottom: 0px;
+  right: 338px;
   width: 70vw;
   max-width: 300px;
+  height: 70vw;
+  max-height: 400px;
   background-color: #141414;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   border: solid 2px #2cdb43;
   border-bottom: none;
-  z-index: 1001;
+  z-index: 1002;
   padding: 1rem;
+  overflow-y: auto;
 }
+
+@media screen and (max-width: 680px){.help-panel{right: 0px;}}
 
 .help-slide-enter-active,
 .help-slide-leave-active {
