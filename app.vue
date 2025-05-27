@@ -30,6 +30,13 @@
             :class="{ 'active': currentMenu === 'CSS Code' }"
           >CSS Code</NuxtLink>
         </li>
+        <li>
+          <NuxtLink
+            to="/live-edit"
+            @click="selectMenu('Live Edit')"
+            :class="{ 'active': currentMenu === 'Live Edit' }"
+          >Live Edit</NuxtLink>
+        </li>
       </ul>
     </nav>
     <button
