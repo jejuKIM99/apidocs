@@ -32,7 +32,7 @@
         </li>
         <li>
           <NuxtLink
-            to="/live-edit"
+            to="/"
             @click="selectMenu('Live Edit')"
             :class="{ 'active': currentMenu === 'Live Edit' }"
           >Live Edit</NuxtLink>
