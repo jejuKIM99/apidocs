@@ -33,9 +33,9 @@
         <li>
           <NuxtLink
             to="/"
-            @click="selectMenu('Live Edit')"
-            :class="{ 'active': currentMenu === 'Live Edit' }"
-          >Live Edit</NuxtLink>
+            @click="selectMenu('Quick Start')"
+            :class="{ 'active': currentMenu === 'Quick Start' }"
+          >Quick Start</NuxtLink>
         </li>
       </ul>
     </nav>
@@ -175,7 +175,7 @@ export default {
     addLibrary(item) {
       this.cartItems.push({
         ...item,
-        docId: this.$route.params.id || 'unknown', 
+        docId: this.$route.params.id || 'unknown',
       });
       this.showAddModal = true;
       setTimeout(() => {

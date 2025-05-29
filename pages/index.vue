@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <div class="search-container">
       <input
         v-model="searchQuery"
@@ -19,7 +18,6 @@
       />
     </div>
 
-    
     <div v-if="currentMenu === 'Fonts'" class="font-preview-input">
       <input v-model="previewText" placeholder="Preview Text" style="width: 400px; height: 30px; border-radius: 6px; border: solid 1px #40ed21; background-color: #000; color: #fff;" />
       <div class="font-controls">
@@ -56,32 +54,61 @@
       </div>
     </div>
 
-    
-    <div class="card-wrapper">
-      <div class="card-container">
-        <NuxtLink v-for="(post, index) in currentPosts" :key="index" :to="`/post/${post.id}`" class="card">
-          <div class="card-header">
-            <div class="card-id">{{ post.id }}</div>
-            <div v-if="post.npm_command" class="cli-badge">Is CLI</div>
+    <div v-if="currentMenu === 'Quick Start'" class="quick-start-container">
+      <div class="quick-start-list">
+        <div v-if="currentPosts.length > 0">
+          <div
+            v-for="post in currentPosts"
+            :key="post.id"
+            @click="selectPost(post)"
+            :class="{ 'selected': post === selectedPost }"
+          >
+            {{ post.title }}
           </div>
-          <div v-if="post.type !== 'Fonts'">
-            <img v-if="post.image_url" :src="post.image_url" alt="게시글 이미지" />
-            <div v-else class="no-image">이미지 없음</div>
-          </div>
-          <div v-else class="font-preview" :style="{ fontFamily: post.font_name || 'sans-serif', fontSize: `${fontSize}px`, fontWeight: fontWeight }">
-            {{ previewText || 'preview' }}
-          </div>
-          <div class="content">
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.date }}</p>
-          </div>
-        </NuxtLink>
+        </div>
+        <div v-else>
+          <p>Quick Start 게시글이 없습니다.</p>
+        </div>
+      </div>
+      <div class="quick-start-content">
+        <div v-if="selectedPost">
+          <h2>{{ selectedPost.title }}</h2>
+          <div class="post-content markdown-body" v-html="parsedSelectedContent"></div>
+        </div>
+        <div v-else>
+          <p>게시글을 선택하세요.</p>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <div class="card-wrapper">
+        <div class="card-container">
+          <NuxtLink v-for="(post, index) in currentPosts" :key="index" :to="`/post/${post.id}`" class="card">
+            <div class="card-header">
+              <div class="card-id">{{ post.id }}</div>
+              <div v-if="post.npm_command" class="cli-badge">Is CLI</div>
+            </div>
+            <div v-if="post.type !== 'Fonts'">
+              <img v-if="post.image_url" :src="post.image_url" alt="게시글 이미지" />
+              <div v-else class="no-image">이미지 없음</div>
+            </div>
+            <div v-else class="font-preview" :style="{ fontFamily: post.font_name || 'sans-serif', fontSize: `${fontSize}px`, fontWeight: fontWeight }">
+              {{ previewText || 'preview' }}
+            </div>
+            <div class="content">
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.date }}</p>
+            </div>
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { parseMarkdown } from '~/utils/markdownParser';
+
 export default {
   data() {
     return {
@@ -92,17 +119,18 @@ export default {
       searchQuery: '',
       isFreeFontFilter: false,
       isCliFilter: false,
+      selectedPost: null,
     };
   },
   computed: {
     currentPosts() {
-      console.log('현재 메뉴:', this.currentMenu); 
+      console.log('현재 메뉴:', this.currentMenu);
       let filteredPosts = this.posts.filter(post => {
-        console.log('게시글 데이터:', post); 
+        console.log('게시글 데이터:', post);
         if (this.currentMenu === 'Library') {
-          return post.type === 'API' && post.is_framework === false; 
+          return post.type === 'API' && post.is_framework === false;
         } else if (this.currentMenu === 'Framework') {
-          return post.type === 'API' && post.is_framework === true; 
+          return post.type === 'API' && post.is_framework === true;
         } else {
           return post.type === this.currentMenu;
         }
@@ -128,12 +156,20 @@ export default {
 
       return filteredPosts;
     },
+    parsedSelectedContent() {
+      return this.selectedPost ? parseMarkdown(this.selectedPost.content) : '';
+    },
   },
   inject: ['currentMenu', 'setCurrentMenu'],
   watch: {
     fontSize(newValue) {
       if (this.$refs.fontSizeSlider) {
         this.$refs.fontSizeSlider.style.setProperty('--value', newValue);
+      }
+    },
+    currentPosts(newPosts) {
+      if (this.currentMenu === 'Quick Start') {
+        this.selectedPost = newPosts[0] || null;
       }
     },
     currentMenu(newMenu) {
@@ -175,7 +211,7 @@ export default {
             npm_command: post.npm_command,
             is_framework: post.is_framework,
           }));
-          console.log('가져온 게시글:', this.posts); 
+          console.log('가져온 게시글:', this.posts);
           await this.loadFonts();
         }
       } catch (err) {
@@ -226,6 +262,9 @@ export default {
           }
         }
       }
+    },
+    selectPost(post) {
+      this.selectedPost = post;
     },
   },
   mounted() {
@@ -444,5 +483,36 @@ export default {
   width: 20px;
   height: 20px;
   accent-color: #40ed21;
+}
+
+.quick-start-container {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem;
+}
+
+.quick-start-list {
+  width: 30%;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.quick-start-list div {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.quick-start-list div.selected {
+  background-color: #40ed21;
+  color: #000;
+}
+
+.quick-start-content {
+  width: 70%;
+}
+
+.quick-start-content h2 {
+  margin-bottom: 1rem;
 }
 </style>
