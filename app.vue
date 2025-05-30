@@ -175,7 +175,7 @@ export default {
     addLibrary(item) {
       this.cartItems.push({
         ...item,
-        docId: this.$route.params.id || 'unknown',
+        docId: item.docId,
       });
       this.showAddModal = true;
       setTimeout(() => {

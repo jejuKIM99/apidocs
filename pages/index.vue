@@ -72,7 +72,15 @@
       </div>
       <div class="quick-start-content">
         <div v-if="selectedPost">
-          <h2>{{ selectedPost.title }}</h2>
+          <div
+            class="post-header"
+            :style="selectedPost.image_url ? { backgroundImage: `url(${selectedPost.image_url})` } : {}"
+          >
+            <div class="text-back"></div>
+            <div class="post-id">{{ selectedPost.id }}</div>
+            <h1>{{ selectedPost.title }}</h1>
+            <button v-if="selectedPost.npm_command" class="add-npm-btn" @click="addToCart(selectedPost)">Add Npm</button>
+          </div>
           <div class="post-content markdown-body" v-html="parsedSelectedContent"></div>
         </div>
         <div v-else>
@@ -110,6 +118,7 @@
 import { parseMarkdown } from '~/utils/markdownParser';
 
 export default {
+  inject: ['currentMenu', 'setCurrentMenu', 'addLibrary'],
   data() {
     return {
       posts: [],
@@ -160,7 +169,6 @@ export default {
       return this.selectedPost ? parseMarkdown(this.selectedPost.content) : '';
     },
   },
-  inject: ['currentMenu', 'setCurrentMenu'],
   watch: {
     fontSize(newValue) {
       if (this.$refs.fontSizeSlider) {
@@ -262,6 +270,14 @@ export default {
           }
         }
       }
+    },
+      addToCart(post) {
+      if (!post || !post.npm_command) return;
+      this.addLibrary({
+        title: post.title,
+        npm_command: post.npm_command,
+        docId: post.id,
+      });
     },
     selectPost(post) {
       this.selectedPost = post;
@@ -509,10 +525,76 @@ export default {
 }
 
 .quick-start-content {
-  width: 70%;
+  width: 100%;
 }
 
-.quick-start-content h2 {
-  margin-bottom: 1rem;
+.quick-start-content .post-header {
+  position: relative;
+  height: 300px;
+  background-size: contain;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 0 0 5px black;
+}
+
+.post-id {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 2;
+}
+
+.add-npm-btn {
+  font-family: 'Super Guardian', sans-serif;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  z-index: 2;
+}
+
+.add-npm-btn:hover {
+  color: #32c91e;
+}
+
+
+.quick-start-content .post-header .text-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: #000000bd;
+  z-index: 0;
+  border-bottom: solid 2px #fff;
+}
+
+.quick-start-content .post-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  z-index: 2;
+}
+
+.quick-start-content .post-content {
+  width: 80vw;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #141414;
+  border: 2px solid #2cdb43;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color: #fff;
 }
 </style>
