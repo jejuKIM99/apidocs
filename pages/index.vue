@@ -544,7 +544,7 @@ export default {
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: #2cd942;
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
