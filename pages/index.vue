@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="search-container">
+    <!-- 수정 1: Quick Start를 제외한 메뉴에서 기존 검색창 유지 -->
+    <div v-if="currentMenu !== 'Quick Start'" class="search-container">
       <input
         v-model="searchQuery"
         type="text"
@@ -8,6 +9,41 @@
         class="search-input"
       />
     </div>
+
+    <!-- 수정 2: 사이드바 토글 버튼 (Quick Start 메뉴에서만 표시) -->
+    <div v-if="currentMenu === 'Quick Start'" class="sidebar-toggle" @click="toggleSidebar" :class="{ 'open': isSidebarOpen }">
+      <span>{{ isSidebarOpen ? '◄' : '►' }}</span>
+    </div>
+
+    <!-- 수정 3: 사이드바 (Quick Start 메뉴에서만 표시) -->
+    <div v-if="currentMenu === 'Quick Start'" class="sidebar" :class="{ 'open': isSidebarOpen }" @click.stop>
+      <div class="search-container">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Title or Contents..."
+          class="search-input"
+        />
+      </div>
+      <div class="quick-start-list">
+        <div v-if="currentPosts.length > 0">
+          <div
+            v-for="post in currentPosts"
+            :key="post.id"
+            @click="selectPost(post)"
+            :class="{ 'selected': post === selectedPost }"
+          >
+            {{ post.title }}
+          </div>
+        </div>
+        <div v-else>
+          <p>Quick Start 게시글이 없습니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수정 4: 사이드바 외부 클릭으로 닫기 위한 오버레이 -->
+    <div v-if="isSidebarOpen && currentMenu === 'Quick Start'" class="sidebar-overlay" @click="toggleSidebar"></div>
 
     <div v-if="currentMenu === 'Library'" class="cli-filter">
       <label for="cli-filter">Is CLI</label>
@@ -19,7 +55,7 @@
     </div>
 
     <div v-if="currentMenu === 'Fonts'" class="font-preview-input">
-      <input v-model="previewText" placeholder="Preview Text" style="width: 400px; height: 30px; border-radius: 6px; border: solid 1px #40ed21; background-color: #000; color: #fff;" />
+      <input v-model="previewText" placeholder="Preview Text" style="width: 240px; height: 40px; border-radius: 6px; border: dashed 2px #40ed21; background-color: #000; color: #fff;" />
       <div class="font-controls">
         <label for="font-size">Font-size: {{ fontSize }}px</label>
         <input
@@ -55,29 +91,14 @@
     </div>
 
     <div v-if="currentMenu === 'Quick Start'" class="quick-start-container">
-      <div class="quick-start-list">
-        <div v-if="currentPosts.length > 0">
-          <div
-            v-for="post in currentPosts"
-            :key="post.id"
-            @click="selectPost(post)"
-            :class="{ 'selected': post === selectedPost }"
-          >
-            {{ post.title }}
-          </div>
-        </div>
-        <div v-else>
-          <p>Quick Start 게시글이 없습니다.</p>
-        </div>
-      </div>
       <div class="quick-start-content">
         <div v-if="selectedPost">
           <div
             class="post-header"
             :style="selectedPost.image_url ? { backgroundImage: `url(${selectedPost.image_url})` } : {}"
           >
-            <div class="text-back"></div>
             <div class="post-id">{{ selectedPost.id }}</div>
+            <div class="text-back"></div>
             <h1>{{ selectedPost.title }}</h1>
             <button v-if="selectedPost.npm_command" class="add-npm-btn" @click="addToCart(selectedPost)">Add Npm</button>
           </div>
@@ -129,6 +150,7 @@ export default {
       isFreeFontFilter: false,
       isCliFilter: false,
       selectedPost: null,
+      isSidebarOpen: false,
     };
   },
   computed: {
@@ -189,6 +211,7 @@ export default {
           }
         });
       }
+      this.isSidebarOpen = false;
     },
   },
   methods: {
@@ -271,7 +294,10 @@ export default {
         }
       }
     },
-      addToCart(post) {
+    selectPost(post) {
+      this.selectedPost = post;
+    },
+    addToCart(post) {
       if (!post || !post.npm_command) return;
       this.addLibrary({
         title: post.title,
@@ -279,8 +305,8 @@ export default {
         docId: post.id,
       });
     },
-    selectPost(post) {
-      this.selectedPost = post;
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
     },
   },
   mounted() {
@@ -303,7 +329,7 @@ export default {
 
 .search-input {
   width: 100%;
-  max-width: 400px;
+  max-width: 280px;
   padding: 0.5rem;
   border: 1px solid #40ed21;
   border-radius: 5px;
@@ -504,28 +530,25 @@ export default {
 .quick-start-container {
   display: flex;
   gap: 2rem;
-  margin: 1rem;
-}
-
-.quick-start-list {
-  width: 30%;
-  overflow-y: auto;
-  max-height: 80vh;
-}
-
-.quick-start-list div {
-  padding: 0.5rem;
-  cursor: pointer;
-  border-bottom: 1px solid #ddd;
-}
-
-.quick-start-list div.selected {
-  background-color: #40ed21;
-  color: #000;
 }
 
 .quick-start-content {
   width: 100%;
+}
+
+.quick-start-content .post-id {
+  position: absolute;
+  top: 0px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 2;
+  width: 230px;
+  border-radius: 20px;
+  text-align: center;
+  padding: 6px;
+  background-color: #2cdb43;
+  text-shadow: 0 0 5px black;
 }
 
 .quick-start-content .post-header {
@@ -539,37 +562,6 @@ export default {
   color: white;
   text-shadow: 0 0 5px black;
 }
-
-.post-id {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: #2cd942;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  z-index: 2;
-}
-
-.add-npm-btn {
-  font-family: 'Super Guardian', sans-serif;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 0.5rem 1rem;
-  background-color: transparent;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1.4rem;
-  z-index: 2;
-}
-
-.add-npm-btn:hover {
-  color: #32c91e;
-}
-
 
 .quick-start-content .post-header .text-back {
   width: 100%;
@@ -596,5 +588,104 @@ export default {
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   color: #fff;
+}
+
+.add-npm-btn {
+  font-family: 'Super Guardian', sans-serif;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  z-index: 2;
+}
+
+.add-npm-btn:hover {
+  color: #32c91e;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #141414;
+  border-right: 2px solid #40ed21;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar .search-container {
+  margin-bottom: 1rem;
+}
+
+.sidebar .quick-start-list {
+  width: 100%;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.sidebar .quick-start-list div {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.sidebar .quick-start-list div.selected {
+  background-color: #40ed21;
+  color: #000;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  left: calc(334px * var(--sidebar-open, 0));
+  transform: translateY(-50%);
+  width: 30px;
+  height: 60px;
+  background-color: #40ed21;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  border-radius: 0 5px 5px 0;
+  transition: left 0.3s ease-in-out, background-color 0.3s ease;
+}
+
+.sidebar-toggle.open {
+  --sidebar-open: 1;
+}
+
+.sidebar-toggle:hover {
+  background-color: #32c91e;
+}
+
+.sidebar-toggle span {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 </style>

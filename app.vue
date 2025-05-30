@@ -218,7 +218,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 1rem 0px;
   background-color: #000;
 }
 .nav-menu {
