@@ -114,7 +114,7 @@
             <div v-if="language === 'KO'" v-html="parsedSelectedContent"></div>
             <div v-else-if="enContent" v-html="parseMarkdown(enContent)"></div>
             <div v-else class="no-translation">
-              <img src="/assets/css/404.png" alt="No-translation" />
+              <img src="/assets/css/404_1.png" alt="No-translation" />
               <p>Translation in progress. We will upload the translation as soon as possible. Sorry for the inconvenience.</p>
             </div>
           </div>
