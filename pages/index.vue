@@ -102,7 +102,22 @@
             <h1>{{ selectedPost.title }}</h1>
             <button v-if="selectedPost.npm_command" class="add-npm-btn" @click="addToCart(selectedPost)">Add Npm</button>
           </div>
-          <div class="post-content markdown-body" v-html="parsedSelectedContent"></div>
+          <div class="post-content markdown-body">
+            <div class="language-switch">
+              <label class="custom_radio">
+                <input type="radio" value="KO" v-model="language" /> <span>KO</span>
+              </label>
+              <label class="custom_radio">
+                <input type="radio" value="EN" v-model="language" /> <span>EN</span>
+              </label>
+            </div>
+            <div v-if="language === 'KO'" v-html="parsedSelectedContent"></div>
+            <div v-else-if="enContent" v-html="parseMarkdown(enContent)"></div>
+            <div v-else class="no-translation">
+              <img src="/assets/css/404.png" alt="No-translation" />
+              <p>Translation in progress. We will upload the translation as soon as possible. Sorry for the inconvenience.</p>
+            </div>
+          </div>
         </div>
         <div v-else>
           <p>게시글을 선택하세요.</p>
@@ -151,6 +166,8 @@ export default {
       isCliFilter: false,
       selectedPost: null,
       isSidebarOpen: false,
+      language: 'KO', // 언어 선택 상태 추가
+      enContent: null, // 영어 내용 상태 추가
     };
   },
   computed: {
@@ -212,6 +229,20 @@ export default {
         });
       }
       this.isSidebarOpen = false;
+    },
+    language(newLang) {
+      if (newLang === 'EN' && this.selectedPost) {
+        this.fetchEnContent();
+      } else {
+        this.enContent = null;
+      }
+    },
+    selectedPost(newPost) {
+      if (newPost && this.language === 'EN') {
+        this.fetchEnContent();
+      } else {
+        this.enContent = null;
+      }
     },
   },
   methods: {
@@ -308,6 +339,21 @@ export default {
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
+    async fetchEnContent() {
+      if (!this.selectedPost) return;
+      const { data, error } = await this.$supabase
+        .from('api_posts_en')
+        .select('content')
+        .eq('post_id', this.selectedPost.id)
+        .single();
+      if (error) {
+        console.error('Error fetching English content:', error);
+        this.enContent = null;
+      } else {
+        this.enContent = data ? data.content : null;
+      }
+    },
+    parseMarkdown,
   },
   mounted() {
     this.fetchPosts();
@@ -588,6 +634,7 @@ export default {
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   color: #fff;
+  position: relative;
 }
 
 .add-npm-btn {
@@ -687,5 +734,63 @@ export default {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
+}
+
+.language-switch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.no-translation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+}
+
+.no-translation img {
+  width: 400px;
+}
+
+.custom_radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.custom_radio span {
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.custom_radio [type="radio"] {
+  appearance: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  border: 2px solid #dcdcdc;
+  border-radius: 250px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.custom_radio [type="radio"]:checked {
+  box-sizing: border-box;
+  border: 5px solid #2cdb43;
+}
+
+.custom_radio [type="radio"]:disabled {
+  background-color: #dcdcdc;
+}
+
+.custom_radio [type="radio"]:disabled + span {
+  color: #dcdcdc;
 }
 </style>
