@@ -219,9 +219,10 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 1rem 0px;
-  background-color: #000;
+  background: linear-gradient(180deg, #2fad19 0%, #ffffff00 90%);
 }
 .nav-menu {
+  flex-wrap: wrap;
   list-style: none;
   display: flex;
   gap: 1rem;

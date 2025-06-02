@@ -584,7 +584,7 @@ export default {
 
 .quick-start-content .post-id {
   position: absolute;
-  top: 0px;
+  top: 10px;
   color: white;
   font-size: 1.2rem;
   font-weight: bold;
@@ -615,7 +615,8 @@ export default {
   position: absolute;
   background: #000000bd;
   z-index: 0;
-  border-bottom: solid 2px #fff;
+  border-bottom: solid 2px #2cdb43;
+  border-top: solid 2px #2cdb43;
 }
 
 .quick-start-content .post-header h1 {

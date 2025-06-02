@@ -470,7 +470,8 @@ pre code.hljs::-webkit-scrollbar-track {
   position: absolute;
   background: #000000bd;
   z-index: 0;
-  border-bottom: solid 2px #fff;
+  border-bottom: solid 2px #2cdb43;
+  border-top: solid 2px #2cdb43;
 }
 
 .post-header {
