@@ -12,7 +12,7 @@
 
     <!-- 수정 2: 사이드바 토글 버튼 (Quick Start 메뉴에서만 표시) -->
     <div v-if="currentMenu === 'Quick Start'" class="sidebar-toggle" @click="toggleSidebar" :class="{ 'open': isSidebarOpen }">
-      <span>{{ isSidebarOpen ? '◄' : '►' }}</span>
+      <span>{{ isSidebarOpen ? '◀' : '▶' }}</span>
     </div>
 
     <!-- 수정 3: 사이드바 (Quick Start 메뉴에서만 표시) -->
@@ -654,7 +654,7 @@ export default {
   left: calc(334px * var(--sidebar-open, 0));
   transform: translateY(-50%);
   width: 30px;
-  height: 60px;
+  height: 140px;
   background-color: #40ed21;
   color: #000;
   display: flex;

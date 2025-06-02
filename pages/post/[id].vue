@@ -9,7 +9,22 @@
       <button class="request-edit-btn" @click="openRequestModal">Request</button>
       <button v-if="post.npm_command" class="add-npm-btn" @click="addToCart()"> Add Npm </button>
     </div>
-    <div class="post-content markdown-body" v-html="parseMarkdown(post.content)"></div>
+    <div class="post-content markdown-body">
+      <div class="language-switch">
+        <label class="custom_radio">
+          <input type="radio" value="KO" v-model="language" /> <span>KO</span>
+        </label>
+        <label class="custom_radio">
+          <input type="radio" value="EN" v-model="language" /> <span>EN</span>
+        </label>
+      </div>
+      <div v-if="language === 'KO'" v-html="parseMarkdown(post.content)"></div>
+      <div v-else-if="enContent" v-html="parseMarkdown(enContent)"></div>
+      <div v-else class="no-translation">
+        <img src="/assets/css/404.png" alt="No-translation" />
+        <p>Translation in progress. We will upload the translation as soon as possible. Sorry for the inconvenience.</p>
+      </div>
+    </div>
     <div class="bottom-margin"></div>
   </div>
   <div v-else-if="error">
@@ -19,7 +34,6 @@
     <p>게시글을 불러오는 중...</p>
   </div>
 
-  
   <div v-if="showRequestModal" class="modal-overlay" @click.self="closeRequestModal">
     <div class="modal-content">
       <button class="close-btn" @click="closeRequestModal">×</button>
@@ -40,11 +54,9 @@
           <textarea
             id="request-content"
             v-model="requestForm.content"
-            placeholder=
-            "요청사항을 입력하세요.
+            placeholder="요청사항을 입력하세요.
 수정 요청의 경우, 해당 게시글 제목을 알려주세요.
-자료 추가 요청의 경우, 공식 문서의 URL을 Markdown URL 형태로 입력해 주세요.
-"
+자료 추가 요청의 경우, 공식 문서의 URL을 Markdown URL 형태로 입력해 주세요."
             rows="10"
             required
           ></textarea>
@@ -61,13 +73,14 @@
 
 <script>
 import hljs from 'highlight.js';
-import 'highlight.js/styles/github-dark.css'; 
+import 'highlight.js/styles/github-dark.css';
 
 export default {
   inject: ['addLibrary'],
   data() {
     return {
       post: null,
+      enContent: null,
       error: null,
       showRequestModal: false,
       requestForm: {
@@ -75,9 +88,35 @@ export default {
         content: '',
       },
       saving: false,
+      language: 'KO',
+      loading: false,
     };
   },
+  watch: {
+    language(newLang) {
+      if (newLang === 'EN') {
+        this.fetchEnContent();
+      } else {
+        this.enContent = null;
+      }
+    },
+  },
   methods: {
+    async fetchEnContent() {
+      this.loading = true;
+      const { data, error } = await this.$supabase
+        .from('api_posts_en')
+        .select('content')
+        .eq('post_id', this.post.id)
+        .single();
+      this.loading = false;
+      if (error) {
+        console.error('Error fetching English content:', error);
+        this.enContent = null;
+      } else {
+        this.enContent = data ? data.content : null;
+      }
+    },
     parseMarkdown(content) {
       if (!content) return '';
 
@@ -146,7 +185,7 @@ export default {
           return;
         } else if (inTable) {
           html += '</tbody></table>';
-           inTable = false;
+          inTable = false;
         }
 
         if (line.trim() === '---') {
@@ -272,11 +311,10 @@ export default {
     addToCart() {
       if (!this.post || !this.post.npm_command) return;
 
-      
       this.addLibrary({
         title: this.post.title,
         npm_command: this.post.npm_command,
-        docId: this.$route.params.id, 
+        docId: this.$route.params.id,
       });
     },
   },
@@ -298,6 +336,7 @@ export default {
 <style>
 .markdown-body {
   line-height: 1.6;
+  position: relative;
 }
 
 .markdown-body h1 {
@@ -476,7 +515,7 @@ pre code.hljs::-webkit-scrollbar-track {
   border-radius: 4px;
   cursor: pointer;
   font-size: 1.4rem;
-  z-index: 2;
+  zinx: 2;
 }
 
 .request-edit-btn:hover {
@@ -609,7 +648,68 @@ pre code.hljs::-webkit-scrollbar-track {
   font-size: 1.4rem;
   z-index: 2;
 }
+
 .add-npm-btn:hover {
   color: #32c91e;
 }
+
+.language-switch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.no-translation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+}
+
+.no-translation img {
+  width: 400px;
+}
+
+
+.custom_radio{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.custom_radio span{
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.custom_radio [type="radio"]{
+  appearance: none;
+  margin:0px;
+  padding:0px;
+  box-sizing: border-box;
+  border:2px solid #dcdcdc;
+  border-radius: 250px;
+  width:18px;
+  height:18px;
+  cursor: pointer;
+}
+
+.custom_radio [type="radio"]:checked{
+  box-sizing: border-box;
+  border:5px solid #2cdb43;
+}
+
+.custom_radio [type="radio"]:disabled{
+  background-color: #dcdcdc;
+}
+
+.custom_radio [type="radio"]:disabled + span{
+  color:#dcdcdc;
+}
+
 </style>
