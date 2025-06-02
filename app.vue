@@ -125,8 +125,10 @@
   </div>
 
   <footer class="footer">
+    <img src="./assets/css/footer_img.png" style="width: 500px; max-width: 100%;" >
     <p>© 2025 Code-Jesus Project. All rights reserved.</p>
-    <p>GitHub: <a href="https://github.com/jejuKIM99" target="_blank">jejuKIM99 GitHub</a></p>
+    <p><img src="./assets/css/github.png" style="filter: invert(1); margin-right: 10px;" > <a href="https://github.com/jejuKIM99" target="_blank">jejuKIM99 GitHub</a></p>
+    <p><img src="./assets/css/npm.png" style="margin-right: 10px;"> <a href="https://www.npmjs.com/package/cojus-cli" target="_blank">cojus-cli</a> </p>
   </footer>
 </template>
 
@@ -230,9 +232,12 @@ export default {
 .nav-menu li a {
   font-size: min(5vw, 24px);
   text-decoration: none;
-  color: white;
+  color: #a5a5a5;
 }
 .nav-menu li a.active {
+  color: #40ed21;
+}
+.nav-menu li a:hover{
   color: #40ed21;
 }
 
@@ -246,6 +251,12 @@ export default {
   color: #40ed21;
   border-top: 1px solid #40ed21;
   margin-top: 2rem;
+}
+
+.footer p{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .footer a {
