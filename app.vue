@@ -43,13 +43,13 @@
       class="cart-toggle-btn"
       @click="toggleCart"
     >
-      🛒
-      <span v-if="cartItems.length > 0" class="cart-indicator"></span>
+      <img src="./assets/css/trolley_24dp_40ED21_FILL0_wght400_GRAD0_opsz24.svg">
+      <span v-if="cartItems.length > 0" class="cart-indicator"><img src="./assets/css/deployed_code_alert_24dp_FF0000_FILL0_wght400_GRAD0_opsz24.svg" style="width: 30px;"></span>
     </button>
 
     <transition name="help-slide">
       <div v-if="showHelp" class="help-panel">
-        <button class="help-close-btn" @click="toggleHelp">✕</button>
+        <button class="help-close-btn" @click="toggleHelp"><img src="./assets/css/close_24dp_FFF_FILL0_wght400_GRAD0_opsz24.svg"></button>
         <div class="help-content">
           <div class="help-section">
             <h3>Step 1: Install Cojus</h3>
@@ -79,8 +79,8 @@
 
     <transition name="cart-slide">
       <div v-if="showCart" class="cart-panel">
-        <button class="cart-close-btn" @click="closeAllPanels">✕</button>
-        <button class="help-btn" @click="toggleHelp">?</button>
+        <button class="cart-close-btn" @click="closeAllPanels"><img src="./assets/css/close_24dp_FFF_FILL0_wght400_GRAD0_opsz24.svg"></button>
+        <button class="help-btn" @click="toggleHelp"><img src="./assets/css/terminal_24dp_40ED21_FILL0_wght400_GRAD0_opsz24.svg"> </button>
         <div class="cart-items-container">
           <div
             v-for="(item, index) in cartItems"
@@ -100,7 +100,7 @@
               @click="removeLibrary(index)"
               title="이 항목 삭제"
             >
-              🗑
+              <img src="./assets/css/delete_forever_24dp_40ED21_FILL0_wght400_GRAD0_opsz24.svg">
             </button>
           </div>
           <p v-if="cartItems.length === 0" class="cart-empty-msg">
@@ -288,12 +288,8 @@ export default {
 
 .cart-indicator {
   position: absolute;
-  top: -5px;
-  left: -5px;
-  width: 10px;
-  height: 10px;
-  background-color: red;
-  border-radius: 50%;
+  top: -14px;
+  left: -14px;
 }
 
 .cart-panel {
@@ -404,7 +400,7 @@ export default {
 }
 
 .cart-items-container {
-  margin-top: 1rem;
+  margin-top: 1.4rem;
 }
 .cart-item {
   position: relative;
@@ -450,22 +446,20 @@ export default {
 .cart-close-btn,
 .help-close-btn {
   position: absolute;
-  top: 0px;
+  top: 4px;
   right: 8px;
   background: transparent;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
   color: #fff;
 }
 
 .help-btn {
   position: absolute;
-  top: 8px;
+  top: 4px;
   left: 8px;
   background: transparent;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
   color: #fff;
 }

@@ -487,6 +487,7 @@ pre code.hljs::-webkit-scrollbar-track {
 }
 
 .post-header h1 {
+  font-family: "Signika Negative", sans-serif;
   margin: 0;
   font-size: 2.5rem;
   z-index: 2;

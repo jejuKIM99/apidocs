@@ -10,10 +10,26 @@
       />
     </div>
 
-    <!-- 수정 2: 사이드바 토글 버튼 (Quick Start 메뉴에서만 표시) -->
-    <div v-if="currentMenu === 'Quick Start'" class="sidebar-toggle" @click="toggleSidebar" :class="{ 'open': isSidebarOpen }">
-      <span>{{ isSidebarOpen ? '◀' : '▶' }}</span>
-    </div>
+<div
+  v-if="currentMenu === 'Quick Start'"
+  class="sidebar-toggle"
+  @click="toggleSidebar"
+  :class="{ open: isSidebarOpen }"
+>
+  <span>
+    <img
+      v-if="isSidebarOpen"
+      src="@/assets/css/arrow_left_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
+      alt="접기"
+    />
+    <img
+      v-else
+      src="@/assets/css/arrow_right_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
+      alt="펼치기"
+    />
+  </span>
+</div>
+
 
     <!-- 수정 3: 사이드바 (Quick Start 메뉴에서만 표시) -->
     <div v-if="currentMenu === 'Quick Start'" class="sidebar" :class="{ 'open': isSidebarOpen }" @click.stop>
@@ -722,9 +738,8 @@ export default {
   background-color: #32c91e;
 }
 
-.sidebar-toggle span {
-  font-size: 1.5rem;
-  font-weight: bold;
+.sidebar-toggle span img {
+  width: 2.4rem;
 }
 
 .sidebar-overlay {
