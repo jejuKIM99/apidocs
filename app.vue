@@ -121,6 +121,11 @@
         Add List!
       </div>
     </transition>
+    <transition name="duplicate-slide">
+      <div v-if="showDuplicateModal" class="duplicate-modal">
+        Duplicate!
+      </div>
+    </transition>
     <SpeedInsights />
   </div>
 
@@ -162,6 +167,7 @@ export default {
       showCopyModal: false,
       showAddModal: false,
       showHelp: false,
+      showDuplicateModal: false, // 중복 모달 표시 여부 추가
     };
   },
   computed: {
@@ -175,14 +181,22 @@ export default {
   },
   methods: {
     addLibrary(item) {
-      this.cartItems.push({
-        ...item,
-        docId: item.docId,
-      });
-      this.showAddModal = true;
-      setTimeout(() => {
-        this.showAddModal = false;
-      }, 1000);
+      const exists = this.cartItems.some(existingItem => existingItem.docId === item.docId);
+      if (exists) {
+        this.showDuplicateModal = true;
+        setTimeout(() => {
+          this.showDuplicateModal = false;
+        }, 1000);
+      } else {
+        this.cartItems.push({
+          ...item,
+          docId: item.docId,
+        });
+        this.showAddModal = true;
+        setTimeout(() => {
+          this.showAddModal = false;
+        }, 1000);
+      }
     },
     removeLibrary(index) {
       this.cartItems.splice(index, 1);
@@ -515,4 +529,34 @@ export default {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+.duplicate-modal {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4d4d;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+}
+
+.duplicate-slide-enter-active,
+.duplicate-slide-leave-active {
+  transition: all 0.3s ease-out;
+}
+.duplicate-slide-enter-from,
+.duplicate-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(100%);
+}
+.duplicate-slide-enter-to,
+.duplicate-slide-leave-from {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 </style>
