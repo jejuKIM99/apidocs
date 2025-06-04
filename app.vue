@@ -464,6 +464,21 @@ export default {
   color: #fff;
 }
 
+    .help-btn::after {
+      content: "Convert to cojus";
+      position: absolute;
+      color: #2cdb43;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      width: 100px;
+      top: 4px;
+      font-weight: bold;
+      font-family: "Signika Negative", sans-serif;
+    }
+
+    .help-btn:hover::after {
+      opacity: 1;
+    }
 .copy-modal,
 .add-modal {
   position: fixed;
