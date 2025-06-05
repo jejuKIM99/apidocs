@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 수정 1: Quick Start를 제외한 메뉴에서 기존 검색창 유지 -->
+    <!-- Quick Start를 제외한 메뉴에서 기존 검색창 유지 -->
     <div v-if="currentMenu !== 'Quick Start'" class="search-container">
       <input
         v-model="searchQuery"
@@ -10,28 +10,28 @@
       />
     </div>
 
-<div
-  v-if="currentMenu === 'Quick Start'"
-  class="sidebar-toggle"
-  @click="toggleSidebar"
-  :class="{ open: isSidebarOpen }"
->
-  <span>
-    <img
-      v-if="isSidebarOpen"
-      src="@/assets/css/arrow_left_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
-      alt="접기"
-    />
-    <img
-      v-else
-      src="@/assets/css/arrow_right_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
-      alt="펼치기"
-    />
-  </span>
-</div>
+    <div
+      v-if="currentMenu === 'Quick Start'"
+      class="sidebar-toggle"
+      @click="toggleSidebar"
+      :class="{ open: isSidebarOpen }"
+    >
+      <span>
+        <img
+          v-if="isSidebarOpen"
+          src="@/assets/css/arrow_left_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
+          alt="접기"
+        />
+        <img
+          v-else
+          src="@/assets/css/arrow_right_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"
+          alt="펼치기"
+        />
+      </span>
+    </div>
 
 
-    <!-- 수정 3: 사이드바 (Quick Start 메뉴에서만 표시) -->
+    <!-- 사이드바 (Quick Start 메뉴에서만 표시) -->
     <div v-if="currentMenu === 'Quick Start'" class="sidebar" :class="{ 'open': isSidebarOpen }" @click.stop>
       <div class="search-container">
         <input
@@ -58,7 +58,7 @@
       </div>
     </div>
 
-    <!-- 수정 4: 사이드바 외부 클릭으로 닫기 위한 오버레이 -->
+    <!-- 사이드바 외부 클릭으로 닫기 위한 오버레이 -->
     <div v-if="isSidebarOpen && currentMenu === 'Quick Start'" class="sidebar-overlay" @click="toggleSidebar"></div>
 
     <div v-if="currentMenu === 'Library'" class="cli-filter">
@@ -411,78 +411,154 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem; /* Increased gap */
   padding: 1rem;
 }
 
+/* Updated Card Styles for Trendy/Futuristic Look */
 .card {
   font-family: "Signika Negative", sans-serif;
-  border: 2px solid #40ed21;
-  border-radius: 5px;
+  border: 2px solid;
+  border-color: #40ed2147;
+  border-radius: 12px; /* Slightly more rounded corners */
   width: min(80vw, 300px);
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  background-color: #000;
+  background: linear-gradient(180deg, #000 90%, #6fc4c5 158%);
+  position: relative; /* For pseudo-elements */
+  transition: all 0.3s ease-in-out; /* Smooth transitions for all properties */
+  /* Subtle outer glow and inner glow */
+  box-shadow: 0 5px 15px rgba(0, 255, 0, 0.2), inset 0 0 8px rgba(0, 255, 0, 0.1);
+  display: flex; /* Flexbox for internal layout control */
+  flex-direction: column; /* Stack content vertically */
+  justify-content: space-between; /* Push header/content to ends */
+  color: #e0e0e0; /* Lighter text for dark background */
+}
+
+/* Pseudo-element for glowing border on hover */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  border-radius: 14px; /* Slightly larger than card radius */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Hover effects for the card */
+.card:hover {
+  transform: translateY(-10px) scale(1.02); /* Lift and slightly enlarge on hover */
+  /* Enhanced glow on hover */
+  box-shadow: 0 10px 30px rgba(0, 255, 0, 0.4), inset 0 0 15px rgba(0, 255, 0, 0.2);
+  border-color: #40ed21;
+}
+
+.card:hover::before {
+  opacity: 1; /* Show glowing border on hover */
 }
 
 .card-header {
   position: relative;
-  background-color: #40ed21;
+  background: linear-gradient(90deg, #6fc4c5, #2cdb43); /* Green gradient for header */
   color: #000;
   text-align: center;
-  padding: 2px;
+  padding: 8px; /* Increased padding */
   font-weight: bold;
+  border-radius: 10px 10px 0 0; /* Match card radius, top only */
 }
 
 .card-id {
-  font-size: 1.2rem;
+  font-size: 1.4rem; /* Slightly larger font size */
+  letter-spacing: 1px; /* Spacing for a futuristic look */
 }
 
 .cli-badge {
   position: absolute;
-  width: 100px;
-  top: 50px;
-  left: -34px;
-  background-color: #ff0000;
+  width: 120px; /* Slightly larger badge */
+  top: 66px;
+  left: -38px; /* Adjusted position for wider badge */
+  background: linear-gradient(45deg, #ff0000, #cc0000); /* Red gradient for CLI badge */
   color: #fff;
-  padding: 0.5rem;
+  padding: 0.5rem 0.8rem; /* More padding */
   transform: rotate(-45deg);
   transform-origin: 0 0;
   z-index: 1;
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.4); /* Shadow for badge */
+  font-size: 0.85rem; /* Smaller font for better fit */
+  text-transform: uppercase; /* All caps */
+  letter-spacing: 1px;
 }
 
 .card img {
   width: 100%;
-  height: 200px;
+  height: 180px; /* Slightly reduced height for better card proportion */
   object-fit: contain;
+  border-bottom: 1px solid rgba(64, 237, 33, 0.3); /* Subtle green line below image */
 }
 
 .no-image {
   width: 100%;
-  height: 200px;
+  height: 180px; /* Match img height */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: #333; /* Darker placeholder background */
+  color: #999;
+  font-size: 1.1rem;
+  font-style: italic;
+  border-bottom: 1px solid rgba(64, 237, 33, 0.3);
 }
 
 .font-preview {
-  height: 200px;
+  height: 180px; /* Match img height */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #212121;
+  background-color: #000; /* Darker background for font preview */
   color: white;
+  border-bottom: 1px solid rgba(64, 237, 33, 0.3);
 }
 
 .card .content {
-  border-top: solid 2px;
   padding: 1rem;
-  background-color: #000;
+  background-color: transparent; /* Let the card's gradient background show through */
+  flex-grow: 1; /* Allow content to grow and push to bottom */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
+.card .content h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #40ed21; /* Green title */
+  font-size: 1.25rem;
+  text-shadow: 0 0 5px rgba(64, 237, 33, 0.3); /* Subtle text glow */
+}
+
+.card .content p {
+  font-size: 0.85rem;
+  color: #b0b0b0; /* Lighter grey for date */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-container {
+    padding: 0.5rem;
+    gap: 1rem; /* Slightly smaller gap on mobile */
+  }
+  .card {
+    width: 90vw; /* On smaller screens, take up more width */
+  }
+}
+
+
+/* Existing styles below for other components */
 .font-preview-input {
   text-align: center;
   margin: 1rem 0;
