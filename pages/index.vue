@@ -68,6 +68,12 @@
         id="cli-filter"
         v-model="isCliFilter"
       />
+      <label for="special-doc-filter" style="margin-left: 1rem;">Special Docs</label>
+      <input
+        type="checkbox"
+        id="special-doc-filter"
+        v-model="isSpecialDocFilter"
+      />
     </div>
 
     <div v-if="currentMenu === 'Fonts'" class="font-preview-input">
@@ -148,6 +154,10 @@
               <div class="card-id">{{ post.id }}</div>
               <div v-if="post.npm_command" class="cli-badge">Is CLI</div>
             </div>
+            <div class="content">
+              <div v-if="post.have_doc" class="special-doc-badge">Special Doc</div>
+              
+            </div>
             <div v-if="post.type !== 'Fonts'">
               <img v-if="post.image_url" :src="post.image_url" alt="게시글 이미지" />
               <div v-else class="no-image">이미지 없음</div>
@@ -180,6 +190,7 @@ export default {
       searchQuery: '',
       isFreeFontFilter: false,
       isCliFilter: false,
+      isSpecialDocFilter: false,
       selectedPost: null,
       isSidebarOpen: false,
       language: 'KO', // 언어 선택 상태 추가
@@ -203,6 +214,10 @@ export default {
 
       if (this.currentMenu === 'Library' && this.isCliFilter) {
         filteredPosts = filteredPosts.filter(post => post.npm_command != null);
+      }
+
+      if (this.currentMenu === 'Library' && this.isSpecialDocFilter) {
+        filteredPosts = filteredPosts.filter(post => post.have_doc === true);
       }
 
       if (this.searchQuery.trim()) {
@@ -266,7 +281,7 @@ export default {
       try {
         const { data, error } = await this.$supabase
           .from('api_posts')
-          .select('*, npm_command, is_framework')
+          .select('*, npm_command, is_framework, have_doc')
           .order('id', { ascending: false });
         if (error) {
           console.error('게시글 가져오기 오류:', error);
@@ -288,6 +303,7 @@ export default {
             is_free_font: post.is_free_font,
             npm_command: post.npm_command,
             is_framework: post.is_framework,
+            have_doc: post.have_doc,
           }));
           console.log('가져온 게시글:', this.posts);
           await this.loadFonts();
@@ -885,4 +901,19 @@ export default {
 .custom_radio [type="radio"]:disabled + span {
   color: #dcdcdc;
 }
+
+.special-doc-badge {
+  background: linear-gradient(45deg, #4e54c8, #8f94fb); /* 보라색 계열 그라데이션 */
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px 0 0 0;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
 </style>

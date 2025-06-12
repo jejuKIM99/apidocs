@@ -6,6 +6,9 @@
     >
       <div class="text-back"></div>
       <h1>{{ post.title }}</h1>
+      <a v-if="post && post.sd_url" :href="post.sd_url" target="_blank" rel="noopener noreferrer">
+        <button class="special-doc-btn">Go to Special Doc</button>
+      </a>
       <button class="request-edit-btn" @click="openRequestModal">Request</button>
       <button v-if="post.npm_command" class="add-npm-btn" @click="addToCart()"> Add Npm </button>
     </div>
@@ -715,4 +718,22 @@ pre code.hljs::-webkit-scrollbar-track {
   color:#dcdcdc;
 }
 
+.special-doc-btn {
+  font-family: 'Super Guardian', sans-serif;
+  position: absolute;
+  bottom: 20px;
+  left: 20px; /* 좌측에 배치 */
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  z-index: 2;
+}
+
+.special-doc-btn:hover {
+  color: #32c91e;
+}
 </style>
