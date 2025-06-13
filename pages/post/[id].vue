@@ -22,9 +22,16 @@
         </label>
       </div>
       <div v-if="language === 'KO'" v-html="parseMarkdown(post.content)"></div>
+      <!-- [수정] 로딩 상태 표시: isEnLoading이 true일 때 로딩 GIF를 보여줍니다. -->
+      <div v-else-if="isEnLoading" class="loading-container">
+          <!-- 중요: loading.gif 파일의 실제 경로를 확인하고 수정해야 합니다. 예: /assets/images/loading.gif -->
+          <img src="/assets/css/loading.gif" alt="번역 로딩 중..." />
+      </div>
+      <!-- [수정] 영어 번역본이 성공적으로 로드되었을 때 표시됩니다. -->
       <div v-else-if="enContent" v-html="parseMarkdown(enContent)"></div>
+      <!-- [수정] 영어 번역본이 없거나 로딩에 실패(타임아웃)했을 때 표시됩니다. -->
       <div v-else class="no-translation">
-        <img src="/assets/css/404_1.png" alt="No-translation" />
+        <img src="/assets/css/404.png" alt="No-translation" />
         <p>Translation in progress. We will upload the translation as soon as possible. Sorry for the inconvenience.</p>
       </div>
     </div>
@@ -92,7 +99,7 @@ export default {
       },
       saving: false,
       language: 'KO',
-      loading: false,
+      isEnLoading: false, // [수정] 'loading'을 'isEnLoading'으로 변경하고 초기값 설정
     };
   },
   watch: {
@@ -105,19 +112,45 @@ export default {
     },
   },
   methods: {
+    // [수정] fetchEnContent 메소드 전체를 새로운 로직으로 변경
     async fetchEnContent() {
-      this.loading = true;
-      const { data, error } = await this.$supabase
+      if (!this.post) return;
+
+      this.isEnLoading = true; // 로딩 시작
+      this.enContent = null;   // 이전 내용 초기화
+
+      // 1초(1000ms) 후에 실패(reject)하는 타이머 Promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => {
+          reject(new Error("Translation request timed out after 1 second."));
+        }, 1000)
+      );
+
+      // Supabase에서 영어 컨텐츠를 가져오는 fetch Promise
+      const fetchPromise = this.$supabase
         .from('api_posts_en')
         .select('content')
         .eq('post_id', this.post.id)
         .single();
-      this.loading = false;
-      if (error) {
-        console.error('Error fetching English content:', error);
-        this.enContent = null;
-      } else {
-        this.enContent = data ? data.content : null;
+
+      try {
+        // fetch와 timeout 중 먼저 끝나는 것을 기다립니다 (Promise.race).
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+        
+        // 이 코드는 fetch가 1초 안에 성공했을 때만 실행됩니다.
+        if (error) {
+          console.error('Error fetching English content:', error);
+          this.enContent = null;
+        } else {
+          this.enContent = data ? data.content : null;
+        }
+      } catch (err) {
+        // 이 코드는 timeout이 먼저 발생(1초 경과)했을 때 실행됩니다.
+        console.warn(err.message); // 콘솔에 타임아웃 메시지 출력
+        this.enContent = null; // 컨텐츠를 null로 설정하여 "no-translation" 메시지가 표시되게 함
+      } finally {
+        // 성공, 실패, 타임아웃 여부와 관계없이 로딩 상태를 종료합니다.
+        this.isEnLoading = false;
       }
     },
     parseMarkdown(content) {
@@ -265,7 +298,7 @@ export default {
     },
     applyInlineStyles(text) {
       text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
-      text = text.replace(/!$$ ([^ $$]*)\]$$ ([^)]+) $$/g, '<img src="$2" alt="$1">');
+      text = text.replace(/!$$([^$$]*)\]$$([^)]+)$$/g, '<img src="$2" alt="$1">');
       text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
       text = text.replace(/`(.*?)`/g, '<code>$1</code>');
@@ -337,6 +370,18 @@ export default {
 </script>
 
 <style>
+/* [추가] 로딩 컨테이너 스타일 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+.loading-container img {
+  width: 200px;
+  height: 200px;
+}
+
 .markdown-body {
   line-height: 1.6;
   position: relative;
