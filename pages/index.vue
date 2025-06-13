@@ -153,10 +153,7 @@
             <div class="card-header">
               <div class="card-id">{{ post.id }}</div>
               <div v-if="post.npm_command" class="cli-badge">Is CLI</div>
-            </div>
-            <div class="content">
               <div v-if="post.have_doc" class="special-doc-badge">Special Doc</div>
-              
             </div>
             <div v-if="post.type !== 'Fonts'">
               <img v-if="post.image_url" :src="post.image_url" alt="게시글 이미지" />
@@ -912,7 +909,7 @@ export default {
   text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   position: absolute;
-  bottom: 0px;
+  bottom: -280px;
   right: 0px;
 }
 
